@@ -1,0 +1,76 @@
+extends layout
+
+block content
+  div(ng-controller='StoreController as store')
+    header
+      h1.text-center Flatlander Crafted Gems
+      |       
+      h2.text-center &ndash; an Angular store &ndash;
+    .list-group
+      .list-group-item(ng-repeat='product in store.products')
+        h3
+          | {{product.name}} 
+          em.pull-right {{product.price | currency}}
+        |         
+        div(ng-controller='GalleryController as gallery', ng-show='product.images.length')
+          .img-wrap
+            img(ng-src='{{product.images[gallery.current]}}')
+          |           
+          ul.img-thumbnails.clearfix
+            li.small-image.pull-left.thumbnail(ng-repeat='image in product.images')
+              img(ng-src='{{image}}')
+        |         
+        section(ng-controller='TabController as tab')
+          ul.nav.nav-pills
+            li(ng-class='{ active:tab.isSet(1) }')
+              a(href='', ng-click='tab.setTab(1)') Description
+            |             
+            li(ng-class='{ active:tab.isSet(2) }')
+              a(href='', ng-click='tab.setTab(2)') Specs
+            |             
+            li(ng-class='{ active:tab.isSet(3) }')
+              a(href='', ng-click='tab.setTab(3)') Reviews
+          |           
+          div(ng-show='tab.isSet(1)')
+            h4 Description
+            |             
+            blockquote {{product.description}}
+          |           
+          div(ng-show='tab.isSet(2)')
+            h4 Specs
+            |             
+            blockquote Shine: {{product.shine}}
+          |           
+          div(ng-show='tab.isSet(3)')
+            ul
+              h4 Reviews
+              |               
+              li(ng-repeat='review in product.reviews')
+                blockquote
+                  strong {{review.stars}} Stars 
+                  | {{review.body}}
+                  cite.clearfix &mdash;{{review.author}}
+            // Review Form
+            form(name='reviewForm', ng-controller='ReviewController as reviewCtrl', ng-submit='reviewForm.$valid && reviewCtrl.addReview(product)' novalidate)
+              // Live Preview
+              blockquote
+                strong {{reviewCtrl.review.stars}} Stars 
+                | {{reviewCtrl.review.body}}    
+                cite.clearfix &mdash;{{reviewCtrl.review.author}}
+              // Review Form
+              h4 Submit a Review
+              |               
+              fieldset.form-group
+                select.form-control(ng-model='reviewCtrl.review.stars', ng-options='stars for stars in [5,4,3,2,1]', title='Stars' required)
+                  option(value='') Rate the Product
+              |               
+              fieldset.form-group
+                textarea.form-control(ng-model='reviewCtrl.review.body', placeholder='Write a short review of the product...', title='Review' required)
+              |               
+              fieldset.form-group
+                input.form-control(ng-model='reviewCtrl.review.author', type='email', placeholder='jimmyDean@example.org', title='Email' required)
+              |               
+              div
+                | reviewFrom is {{reviewForm.$valid}}
+              fieldset.form-group
+                input.btn.btn-primary.pull-right(type='submit', value='Submit Review')
